@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mattehjelpen 🧮</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF9F0;
+    --card: #FFFFFF;
+    --yellow: #FFD93D;
+    --orange: #FF6B35;
+    --teal: #4ECDC4;
+    --purple: #9B5DE5;
+    --green: #06D6A0;
+    --pink: #FF6B9D;
+    --dark: #2D2D2D;
+    --muted: #888;
+    --radius: 20px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--dark);
+    background-image: radial-gradient(circle at 20% 20%, rgba(78,205,196,0.12) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(155,93,229,0.10) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+  }
+
+  header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 800;
+    color: var(--orange);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  header h1 span { color: var(--purple); }
+  header p {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1.2rem 4rem; }
+
+  /* TOPIC GRID */
+  .section-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 2rem 0 1rem;
+  }
+
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .topic-btn {
+    background: var(--card);
+    border: 3px solid transparent;
+    border-radius: var(--radius);
+    padding: 1.2rem 0.8rem;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .topic-btn:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,0.14); }
+  .topic-btn.active { border-color: var(--orange); background: #FFF3EA; }
+
+  .topic-btn .icon {
+    font-size: 2.2rem;
+    display: block;
+  }
+
+  .topic-btn[data-color="yellow"] .icon-bg { background: #FFF7D6; }
+  .topic-btn[data-color="teal"]   .icon-bg { background: #E0FAF8; }
+  .topic-btn[data-color="purple"] .icon-bg { background: #F3EAFF; }
+  .topic-btn[data-color="green"]  .icon-bg { background: #E0FAF3; }
+  .topic-btn[data-color="pink"]   .icon-bg { background: #FFE8F3; }
+  .topic-btn[data-color="orange"] .icon-bg { background: #FFF0E8; }
+
+  .icon-bg {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 0.2rem;
+  }
+
+  /* EXAMPLE AREA */
+  #example-area {
+    display: none;
+    margin-top: 2rem;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .example-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.2rem;
+    border-left: 6px solid var(--teal);
+  }
+
+  .example-card h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    color: var(--purple);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .example-card .problem {
+    background: #F7F3FF;
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--dark);
+  }
+
+  .steps { list-style: none; }
+  .steps li {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.98rem;
+  }
+  .steps li .step-num {
+    min-width: 28px; height: 28px;
+    background: var(--teal);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: 0.85rem;
+    margin-top: 1px;
+  }
+  .steps li .step-text { line-height: 1.5; }
+  .steps li .step-text strong { color: var(--orange); }
+
+  .answer-box {
+    background: linear-gradient(135deg, var(--green), #0ea886);
+    color: white;
+    border-radius: 12px;
+    padding: 0.8rem 1.1rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-top: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  /* ===== REGNEBOK-STIL ===== */
+  .notebook-wrap {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin: 0.5rem 0 1rem;
+  }
+
+  .notebook-calc {
+    font-family: 'Courier New', monospace;
+    font-size: 1.35rem;
+    font-weight: bold;
+    background: #FAFAF5;
+    border: 2px solid #E8E4D8;
+    border-radius: 12px;
+    padding: 1.2rem 1.6rem 1rem;
+    display: inline-block;
+    min-width: 160px;
+    line-height: 1.9;
+    position: relative;
+  }
+
+  .notebook-calc .nb-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .nb-operator {
+    color: var(--orange);
+    font-size: 1.3rem;
+    margin-right: 0.3rem;
+  }
+
+  .nb-carry {
+    font-size: 0.72rem;
+    color: #E05A00;
+    font-weight: 900;
+    vertical-align: super;
+    letter-spacing: 0.5px;
+    margin-right: 1px;
+  }
+
+  .nb-borrow {
+    font-size: 0.72rem;
+    color: #0077CC;
+    font-weight: 900;
+    vertical-align: super;
+  }
+
+  .nb-line {
+    border: none;
+    border-top: 2.5px solid var(--dark);
+    margin: 2px 0;
+    width: 100%;
+  }
+
+  .nb-double-line {
+    border: none;
+    border-top: 2.5px solid var(--dark);
+    box-shadow: 0 4px 0 0 var(--dark);
+    margin: 4px 0 8px;
+    width: 100%;
+    padding-bottom: 3px;
+  }
+
+  .nb-answer {
+    color: #0077CC;
+    font-weight: 900;
+  }
+
+  /* Divisjon-stil (gammeldags krakk) */
+  .nb-division {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #FAFAF5;
+    border: 2px solid #E8E4D8;
+    border-radius: 12px;
+    padding: 1.2rem 1.6rem 1rem;
+    display: inline-block;
+    line-height: 2;
+  }
+
+  .nb-division .div-top {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    border-bottom: 2.5px solid var(--dark);
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+  }
+
+  .nb-division .div-divisor {
+    border-right: 2.5px solid var(--dark);
+    padding-right: 8px;
+    margin-right: 8px;
+    color: var(--orange);
+  }
+
+  .nb-division .div-quotient {
+    color: #0077CC;
+    font-weight: 900;
+    text-decoration: overline;
+  }
+
+  .nb-division .div-steps {
+    padding-left: 1rem;
+  }
+
+  .nb-division .div-step-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .nb-division .div-sep {
+    border-top: 1.5px solid #999;
+    margin: 1px 0;
+  }
+
+  .nb-note {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+
+  .nb-note strong { color: var(--orange); }
+  .nb-note .blue { color: #0077CC; }
+
+  .nb-legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    margin-top: 0.7rem;
+    font-family: 'Nunito', sans-serif;
+  }
+  .nb-legend span { display: flex; align-items: center; gap: 0.3rem; }
+  .dot-carry { color: #E05A00; font-weight: 900; font-size: 1rem; }
+  .dot-borrow { color: #0077CC; font-weight: 900; font-size: 1rem; }
+  .dot-answer { color: #0077CC; font-weight: 900; font-size: 1rem; }
+
+  /* Hint / Try yourself box */
+  .try-box {
+    background: linear-gradient(135deg, #FFD93D, #FFB627);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.8rem;
+    margin-top: 0.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 4px 20px rgba(255,182,39,0.3);
+  }
+  .try-box .big-emoji { font-size: 2.2rem; }
+
+  /* Video section */
+  .video-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    margin-top: 1.2rem;
+    border-left: 6px solid #FF0000;
+  }
+  .video-section h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    color: #CC0000;
+  }
+  .video-section p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0.9rem;
+  }
+  .video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .video-embed-wrap {
+    flex: 1 1 300px;
+    max-width: 480px;
+  }
+  .video-embed-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #CC0000;
+    margin-bottom: 0.4rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .video-embed-title::before {
+    content: '';
+    display: inline-block;
+    width: 18px; height: 18px;
+    background: #FF0000;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .video-iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  .video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: #FFF0F0;
+    border: 2px solid #FFCCCC;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #CC0000;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .video-link:hover {
+    background: #FFDDDD;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(204,0,0,0.15);
+  }
+  .yt-icon {
+    width: 22px; height: 22px;
+    background: #FF0000;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .yt-icon::after {
+    content: '';
+    display: block;
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 9px solid white;
+    margin-left: 2px;
+  }
+
+
+
+  @media (max-width: 600px) {
+    .topics { grid-template-columns: repeat(2, 1fr); }
+    header h1 { font-size: 1.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧮 Matte<span>hjelpen</span></h1>
+  <p>Lær av eksempler – og løs oppgaven selv! 💪</p>
+</header>
+
+<div class="container">
+
+  <div class="section-title">📚 Velg et tema</div>
+
+  <div class="topics" id="topics">
+    <button class="topic-btn" data-topic="addisjon" data-color="yellow" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#FFF7D6">➕</div>
+      Addisjon
+    </button>
+    <button class="topic-btn" data-topic="subtraksjon" data-color="teal" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#E0FAF8">➖</div>
+      Subtraksjon
+    </button>
+    <button class="topic-btn" data-topic="multiplikasjon" data-color="orange" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#FFF0E8">✖️</div>
+      Multiplikasjon
+    </button>
+    <button class="topic-btn" data-topic="divisjon" data-color="purple" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#F3EAFF">➗</div>
+      Divisjon
+    </button>
+    <button class="topic-btn" data-topic="brok" data-color="pink" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#FFE8F3">🍕</div>
+      Brøk
+    </button>
+    <button class="topic-btn" data-topic="desimaltall" data-color="green" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#E0FAF3">🔢</div>
+      Desimaltall
+    </button>
+    <button class="topic-btn" data-topic="geometri" data-color="teal" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#E0FAF8">📐</div>
+      Geometri
+    </button>
+    <button class="topic-btn" data-topic="prosent" data-color="orange" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#FFF0E8">💯</div>
+      Prosent
+    </button>
+    <button class="topic-btn" data-topic="tekstoppgaver" data-color="yellow" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#FFF7D6">📝</div>
+      Tekstoppgaver
+    </button>
+    <button class="topic-btn" data-topic="statistikk" data-color="purple" onclick="showTopic(this)">
+      <div class="icon-bg" style="background:#F3EAFF">📊</div>
+      Statistikk
+    </button>
+  </div>
+
+  <div id="example-area">
+    <div class="section-title" id="example-title"></div>
+    <div id="examples-container"></div>
+
+    <div class="try-box">
+      <div class="big-emoji">✏️</div>
+      <div>
+        <strong>Nå er det din tur!</strong><br>
+        Se på eksemplene ovenfor og prøv å løse oppgaven din i skriveboken. Du klarer det! 🌟
+      </div>
+    </div>
+
+    <!-- Video section -->
+    <div class="video-section" id="video-section" style="display:none;"></div>
+
+
+  </div>
+
+</div>
+
+<script>
+const EXAMPLES = {
+  addisjon: {
+    title: "➕ Addisjon – eksempler",
+    color: "#FFD93D",
+    type: "notebook",
+    videos: [
+      { title: "Addisjon – sette opp og regne ut", id: "ZrPhd5vEj0I" },
+    ],
+    items: [
+      {
+        problem: "3 456 + 2 789",
+        notebook: `<div class="notebook-wrap">
+          <div class="notebook-calc">
+            <div class="nb-row" style="font-size:0.78rem;color:#E05A00;letter-spacing:3px;min-height:1.3em;justify-content:flex-end;padding-right:2px;">
+              <span style="display:inline-block;width:1.1ch">&nbsp;</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">&nbsp;</span>
+            </div>
+            <div class="nb-row"><span>&nbsp;&nbsp;&nbsp;</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+            <div class="nb-row"><span class="nb-operator">+</span><span>&nbsp;&nbsp;</span><span>2</span><span>7</span><span>8</span><span>9</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row"><span>&nbsp;&nbsp;</span><span class="nb-answer">6</span><span class="nb-answer">2</span><span class="nb-answer">4</span><span class="nb-answer">5</span></div>
+            <hr class="nb-double-line"/>
+          </div>
+          <div>
+            <div class="nb-note">
+              <strong>Start alltid med enerne (høyre):</strong><br>
+              6+9=15 → skriv <b>5</b>, bær <span style="color:#E05A00">1</span><br>
+              5+8+<span style="color:#E05A00">1</span>=14 → skriv <b>4</b>, bær <span style="color:#E05A00">1</span><br>
+              4+7+<span style="color:#E05A00">1</span>=12 → skriv <b>2</b>, bær <span style="color:#E05A00">1</span><br>
+              3+2+<span style="color:#E05A00">1</span>=<b>6</b>
+            </div>
+            <div class="nb-legend">
+              <span><span style="color:#E05A00;font-weight:900">1</span> = bæretall</span>
+              <span><span style="color:#0077CC;font-weight:900">blå</span> = svar</span>
+            </div>
+          </div>
+        </div>`,
+        answer: "3 456 + 2 789 = 6 245"
+      },
+      {
+        problem: "1 008 + 994",
+        notebook: `<div class="notebook-wrap">
+          <div class="notebook-calc">
+            <div class="nb-row" style="font-size:0.78rem;color:#E05A00;letter-spacing:3px;min-height:1.3em;justify-content:flex-end;padding-right:2px;">
+              <span style="display:inline-block;width:1.1ch">&nbsp;</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">&nbsp;</span><span style="display:inline-block;width:1.1ch">&nbsp;</span>
+            </div>
+            <div class="nb-row"><span>&nbsp;&nbsp;</span><span>1</span><span>0</span><span>0</span><span>8</span></div>
+            <div class="nb-row"><span class="nb-operator">+</span><span>&nbsp;&nbsp;&nbsp;</span><span>9</span><span>9</span><span>4</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row"><span>&nbsp;</span><span class="nb-answer">2</span><span class="nb-answer">0</span><span class="nb-answer">0</span><span class="nb-answer">2</span></div>
+            <hr class="nb-double-line"/>
+          </div>
+          <div>
+            <div class="nb-note">
+              8+4=12 → skriv <b>2</b>, bær <span style="color:#E05A00">1</span><br>
+              0+9+<span style="color:#E05A00">1</span>=10 → skriv <b>0</b>, bær <span style="color:#E05A00">1</span><br>
+              0+9+<span style="color:#E05A00">1</span>=10 → skriv <b>0</b>, bær <span style="color:#E05A00">1</span><br>
+              1+0+<span style="color:#E05A00">1</span>=<b>2</b>
+            </div>
+          </div>
+        </div>`,
+        answer: "1 008 + 994 = 2 002"
+      }
+    ]
+  },
+  subtraksjon: {
+    title: "➖ Subtraksjon – eksempler",
+    color: "#4ECDC4",
+    type: "notebook",
+    videos: [
+      { title: "Subtraksjon – sette opp og regne ut", id: "Ej45sLTwGHY" },
+    ],
+    items: [
+      {
+        problem: "5 432 − 1 867",
+        notebook: `<div class="notebook-wrap">
+          <div class="notebook-calc">
+            <div class="nb-row" style="font-size:0.78rem;color:#0077CC;letter-spacing:3px;min-height:1.3em;justify-content:flex-end;padding-right:2px;">
+              <span style="display:inline-block;width:1.1ch">&nbsp;</span><span style="display:inline-block;width:1.1ch">¹</span><span style="display:inline-block;width:1.1ch">¹</span><span style="display:inline-block;width:1.1ch">¹</span><span style="display:inline-block;width:1.1ch">&nbsp;</span>
+            </div>
+            <div class="nb-row"><span>&nbsp;&nbsp;</span><span>5</span><span>4</span><span>3</span><span>2</span></div>
+            <div class="nb-row"><span class="nb-operator">−</span><span>&nbsp;&nbsp;</span><span>1</span><span>8</span><span>6</span><span>7</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row"><span>&nbsp;&nbsp;</span><span class="nb-answer">3</span><span class="nb-answer">5</span><span class="nb-answer">6</span><span class="nb-answer">5</span></div>
+            <hr class="nb-double-line"/>
+          </div>
+          <div>
+            <div class="nb-note">
+              <strong>Når tallet er for lite → lån fra naboen!</strong><br>
+              2−7 går ikke → lån: <span style="color:#0077CC">12</span>−7=<b>5</b><br>
+              3(−1)=2, 2−6 går ikke → lån: <span style="color:#0077CC">12</span>−6=<b>6</b><br>
+              4(−1)=3, 3−8 går ikke → lån: <span style="color:#0077CC">13</span>−8=<b>5</b><br>
+              5(−1)=4 − 1 = <b>3</b>
+            </div>
+            <div class="nb-legend">
+              <span><span style="color:#0077CC;font-weight:900">¹</span> = lån (én mindre)</span>
+              <span><span style="color:#0077CC;font-weight:900">blå</span> = svar</span>
+            </div>
+          </div>
+        </div>`,
+        answer: "5 432 − 1 867 = 3 565"
+      }
+    ]
+  },
+  multiplikasjon: {
+    title: "✖️ Multiplikasjon – eksempler",
+    color: "#FF6B35",
+    type: "notebook",
+    videos: [
+      { title: "Multiplikasjon – ett og tosifrede tall", id: "io0Uu4nwG8w" },
+    ],
+    items: [
+      {
+        problem: "346 × 4",
+        notebook: `<div class="notebook-wrap">
+          <div class="notebook-calc">
+            <div class="nb-row" style="font-size:0.78rem;color:#E05A00;letter-spacing:3px;min-height:1.3em;justify-content:flex-end;padding-right:2px;">
+              <span style="display:inline-block;width:1.1ch">&nbsp;</span><span style="display:inline-block;width:1.1ch">1</span><span style="display:inline-block;width:1.1ch">2</span><span style="display:inline-block;width:1.1ch">&nbsp;</span>
+            </div>
+            <div class="nb-row"><span>&nbsp;&nbsp;&nbsp;</span><span>3</span><span>4</span><span>6</span></div>
+            <div class="nb-row"><span class="nb-operator">×</span><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span>4</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row"><span>&nbsp;</span><span class="nb-answer">1</span><span class="nb-answer">3</span><span class="nb-answer">8</span><span class="nb-answer">4</span></div>
+            <hr class="nb-double-line"/>
+          </div>
+          <div>
+            <div class="nb-note">
+              <strong>Gang siffer for siffer, høyre mot venstre:</strong><br>
+              6×4=24 → skriv <b>4</b>, bær <span style="color:#E05A00">2</span><br>
+              4×4=16+<span style="color:#E05A00">2</span>=18 → skriv <b>8</b>, bær <span style="color:#E05A00">1</span><br>
+              3×4=12+<span style="color:#E05A00">1</span>=13 → skriv <b>13</b>
+            </div>
+          </div>
+        </div>`,
+        answer: "346 × 4 = 1 384"
+      },
+      {
+        problem: "23 × 15",
+        notebook: `<div class="notebook-wrap">
+          <div class="notebook-calc" style="min-width:180px">
+            <div class="nb-row" style="min-height:1.3em;"></div>
+            <div class="nb-row"><span>&nbsp;&nbsp;&nbsp;</span><span>2</span><span>3</span></div>
+            <div class="nb-row"><span class="nb-operator">×</span><span>&nbsp;&nbsp;</span><span>1</span><span>5</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row" style="color:#777"><span>&nbsp;&nbsp;</span><span>1</span><span>1</span><span>5</span></div>
+            <div class="nb-row" style="color:#777"><span>&nbsp;</span><span>2</span><span>3</span><span>0</span><span>&nbsp;</span></div>
+            <hr class="nb-line"/>
+            <div class="nb-row"><span>&nbsp;</span><span class="nb-answer">3</span><span class="nb-answer">4</span><span class="nb-answer">5</span></div>
+            <hr class="nb-double-line"/>
+          </div>
+          <div>
+            <div class="nb-note">
+              <strong>Gang med hvert siffer, legg deretter sammen:</strong><br>
+              23 × 5 = <b>115</b> (første rad)<br>
+              23 × 10 = <b>230</b> (flytt én plass til venstre)<br>
+              115 + 230 = <b>345</b>
+            </div>
+          </div>
+        </div>`,
+        answer: "23 × 15 = 345"
+      }
+    ]
+  },
+  divisjon: {
+    title: "➗ Divisjon – eksempler",
+    color: "#9B5DE5",
+    type: "notebook",
+    videos: [
+      { title: "Divisjon – krakk-metoden", id: "wqcDKAGePxA" },
+    ],
+    items: [
+      {
+        problem: "846 ÷ 3",
+        notebook: `<div class="notebook-wrap">
+          <div class="nb-division">
+            <div class="div-top">
+              <span class="div-divisor">3</span>
+              <span style="letter-spacing:0.15em">846</span>
+              <span style="margin-left:1rem;color:#0077CC;font-weight:900;border-bottom:3.5px double #0077CC;padding-bottom:1px;">&nbsp;282&nbsp;</span>
+            </div>
+            <div class="div-steps" style="font-family:'Courier New',monospace;font-size:1.1rem;line-height:1.8;padding-left:0.5rem;">
+              <div style="text-align:right;width:4ch">8</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−6</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch">24</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−24</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch">06</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−6</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch;color:#0077CC;font-weight:900">0</div>
+            </div>
+          </div>
+          <div>
+            <div class="nb-note">
+              <strong>Krakk-metoden:</strong><br>
+              Dividenden (846) i krakken, divisor (3) utenfor.<br>
+              Svaret skrives over streken.<br><br>
+              8÷3=<b>2</b> (rest 2) → ta ned 4 → 24<br>
+              24÷3=<b>8</b> (rest 0) → ta ned 6<br>
+              6÷3=<b>2</b> (rest 0) ✓
+            </div>
+            <div class="nb-legend">
+              <span><span style="color:#E05A00;font-weight:900">rød</span> = trekker fra</span>
+              <span><span style="color:#0077CC;font-weight:900">blå</span> = svar/rest</span>
+            </div>
+          </div>
+        </div>`,
+        answer: "846 ÷ 3 = 282"
+      },
+      {
+        problem: "952 ÷ 4",
+        notebook: `<div class="notebook-wrap">
+          <div class="nb-division">
+            <div class="div-top">
+              <span class="div-divisor">4</span>
+              <span style="letter-spacing:0.15em">952</span>
+              <span style="margin-left:1rem;color:#0077CC;font-weight:900;border-bottom:3.5px double #0077CC;padding-bottom:1px;">&nbsp;238&nbsp;</span>
+            </div>
+            <div class="div-steps" style="font-family:'Courier New',monospace;font-size:1.1rem;line-height:1.8;padding-left:0.5rem;">
+              <div style="text-align:right;width:4ch">9</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−8</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch">15</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−12</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch">32</div>
+              <div style="text-align:right;width:4ch;color:#E05A00">−32</div>
+              <div style="border-top:1.5px solid #999;width:4ch;margin:1px 0 1px auto;"></div>
+              <div style="text-align:right;width:4ch;color:#0077CC;font-weight:900">0</div>
+            </div>
+          </div>
+          <div>
+            <div class="nb-note">
+              9÷4=<b>2</b> (rest 1) → 15<br>
+              15÷4=<b>3</b> (rest 3) → 32<br>
+              32÷4=<b>8</b> (rest 0) ✓
+            </div>
+          </div>
+        </div>`,
+        answer: "952 ÷ 4 = 238"
+      }
+    ]
+  },
+  brok: {
+    title: "🍕 Brøk – eksempler",
+    color: "#FF6B9D",
+    videos: [
+      { title: "Brøk 1 – Hva er en brøk?", url: "https://www.youtube.com/results?search_query=skolekyllo+br%C3%B8k+1" },
+      { title: "Brøk 2 – Ekte/uekte, multiplikasjon", url: "https://www.youtube.com/results?search_query=skolekyllo+br%C3%B8k+2" },
+    ],
+    items: [
+      {
+        problem: "1/4 + 2/4 = ?",
+        steps: [
+          { text: "Nevnerne er like (begge 4). Da adderer vi bare tellerne." },
+          { text: "<strong>1 + 2 = 3</strong>. Nevneren forblir 4." },
+        ],
+        answer: "1/4 + 2/4 = 3/4"
+      },
+      {
+        problem: "3/6 forenklet?",
+        steps: [
+          { text: "Finn største felles faktor for 3 og 6. Det er <strong>3</strong>." },
+          { text: "Del teller og nevner på 3: <strong>3÷3 = 1</strong> og <strong>6÷3 = 2</strong>." },
+        ],
+        answer: "3/6 = 1/2"
+      }
+    ]
+  },
+  desimaltall: {
+    title: "🔢 Desimaltall – eksempler",
+    color: "#06D6A0",
+    videos: [
+      { title: "Desimaltall – hva er det og hvordan regner vi?", url: "https://www.youtube.com/results?search_query=skolekyllo+desimaltall" },
+      { title: "Divisjon 2 – svar som desimaltall", url: "https://www.youtube.com/results?search_query=skolekyllo+divisjon+2+desimaltall" },
+    ],
+    items: [
+      {
+        problem: "3,45 + 1,7 = ?",
+        steps: [
+          { text: "Skriv tallene under hverandre med <strong>komma under komma</strong>: 3,45 og 1,70" },
+          { text: "Hundredeler: 5 + 0 = 5." },
+          { text: "Tideler: 4 + 7 = 11. Skriv 1, bær 1." },
+          { text: "Enere: 3 + 1 + 1 = 5." },
+        ],
+        answer: "3,45 + 1,7 = 5,15"
+      }
+    ]
+  },
+  geometri: {
+    title: "📐 Geometri – eksempler",
+    color: "#4ECDC4",
+    videos: [
+      { title: "Areal og omkrets", url: "https://www.youtube.com/results?search_query=skolekyllo+areal+omkrets" },
+      { title: "Geometri – trekanter og firkanter", url: "https://www.youtube.com/results?search_query=skolekyllo+geometri" },
+    ],
+    items: [
+      {
+        problem: "Areal av rektangel: lengde=8 cm, bredde=5 cm",
+        steps: [
+          { text: "Formelen for areal av rektangel: <strong>A = lengde × bredde</strong>" },
+          { text: "Sett inn verdiene: <strong>A = 8 × 5 = 40</strong>" },
+          { text: "Husk alltid enheten: cm²" },
+        ],
+        answer: "Arealet = 40 cm²"
+      },
+      {
+        problem: "Omkrets av rektangel: l=8 cm, b=5 cm",
+        steps: [
+          { text: "Formelen: <strong>O = 2 × (lengde + bredde)</strong>" },
+          { text: "Sett inn: <strong>O = 2 × (8 + 5) = 2 × 13 = 26</strong>" },
+        ],
+        answer: "Omkretsen = 26 cm"
+      }
+    ]
+  },
+  prosent: {
+    title: "💯 Prosent – eksempler",
+    color: "#FF6B35",
+    videos: [
+      { title: "Prosent – hva er det og hvordan regner vi?", url: "https://www.youtube.com/results?search_query=skolekyllo+prosent" },
+    ],
+    items: [
+      {
+        problem: "Hva er 25% av 200?",
+        steps: [
+          { text: "25% betyr <strong>25/100</strong>, altså en fjerdedel." },
+          { text: "Del 200 på 100: <strong>200 ÷ 100 = 2</strong> (det er 1%)." },
+          { text: "Gang med 25: <strong>2 × 25 = 50</strong>." },
+        ],
+        answer: "25% av 200 = 50"
+      }
+    ]
+  },
+  tekstoppgaver: {
+    title: "📝 Tekstoppgaver – eksempler",
+    color: "#FFD93D",
+    videos: [
+      { title: "Tekstoppgaver – slik løser du dem steg for steg", url: "https://www.youtube.com/results?search_query=skolekyllo+tekstoppgaver+matematikk" },
+    ],
+    items: [
+      {
+        problem: "Kari har 48 kr. Hun kjøper en is til 15 kr. Hvor mye har hun igjen?",
+        steps: [
+          { text: "<strong>Les nøye</strong>: Hva vet vi? Kari har 48 kr. Is koster 15 kr." },
+          { text: "Hva spør oppgaven om? Hvor mye har hun <em>igjen</em> → vi bruker subtraksjon." },
+          { text: "Regn: <strong>48 − 15 = 33</strong>" },
+          { text: "Svar med setning: <em>«Kari har 33 kr igjen.»</em>" },
+        ],
+        answer: "Kari har 33 kr igjen"
+      }
+    ]
+  },
+  statistikk: {
+    title: "📊 Statistikk – eksempler",
+    color: "#9B5DE5",
+    videos: [
+      { title: "Statistikk – gjennomsnitt, median og typetall", url: "https://www.youtube.com/results?search_query=skolekyllo+statistikk+gjennomsnitt" },
+    ],
+    items: [
+      {
+        problem: "Finn gjennomsnittet av: 4, 7, 3, 8, 3",
+        steps: [
+          { text: "<strong>Legg alle tallene sammen</strong>: 4 + 7 + 3 + 8 + 3 = 25" },
+          { text: "Tell <strong>antall tall</strong>: det er 5 tall." },
+          { text: "Del summen på antallet: <strong>25 ÷ 5 = 5</strong>" },
+        ],
+        answer: "Gjennomsnittet = 5"
+      }
+    ]
+  }
+};
+
+
+
+function showTopic(btn) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const topic = btn.dataset.topic;
+  const data = EXAMPLES[topic];
+
+  document.getElementById('example-title').textContent = data.title;
+
+  const container = document.getElementById('examples-container');
+  container.innerHTML = '';
+
+  data.items.forEach((ex, i) => {
+    const card = document.createElement('div');
+    card.className = 'example-card';
+    card.style.borderLeftColor = data.color;
+
+    let contentHtml = '';
+    if (data.type === 'notebook') {
+      contentHtml = ex.notebook;
+    } else {
+      const stepsHtml = ex.steps.map((s, idx) => `
+        <li>
+          <span class="step-num">${idx+1}</span>
+          <span class="step-text">${s.text}</span>
+        </li>`).join('');
+      contentHtml = `<ul class="steps">${stepsHtml}</ul>`;
+    }
+
+    card.innerHTML = `
+      <h3>🔍 Eksempel ${i+1}</h3>
+      <div class="problem">📌 ${ex.problem}</div>
+      ${contentHtml}
+      <div class="answer-box">✅ Svar: ${ex.answer}</div>
+    `;
+    container.appendChild(card);
+  });
+
+  // Render video section
+  const videoSection = document.getElementById('video-section');
+  if (data.videos && data.videos.length > 0) {
+    const videosHtml = data.videos.map(v => {
+      if (v.id) {
+        return `<div class="video-embed-wrap">
+          <div class="video-embed-title">${v.title}</div>
+          <iframe class="video-iframe"
+            src="https://www.youtube.com/embed/${v.id}"
+            title="${v.title}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>`;
+      } else {
+        return `<a class="video-link" href="${v.url}" target="_blank" rel="noopener">
+          <span class="yt-icon"></span>${v.title}
+        </a>`;
+      }
+    }).join('');
+    videoSection.innerHTML = `
+      <h3>▶️ Se SkoleKyllo-video om dette temaet</h3>
+      <p>Laget av lærer Ole Martin Kyllo – perfekt for mellomtrinnet!</p>
+      <div class="video-grid">${videosHtml}</div>
+    `;
+    videoSection.style.display = 'block';
+  } else {
+    videoSection.style.display = 'none';
+  }
+
+  const area = document.getElementById('example-area');
+  area.style.display = 'block';
+  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+}
+</script>
+</body>
+</html>
